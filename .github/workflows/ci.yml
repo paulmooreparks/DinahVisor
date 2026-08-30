@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go version
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test -count=1 ./...
+
+  gofmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go version
+      - name: gofmt
+        run: |
+          # Scoped to the Go trees rather than run from the root, matching
+          # dinah's own job: a dependency that vendors an unformatted .go
+          # file as testdata must not turn this job red for a reason that
+          # has nothing to do with this repository's code. Add each new
+          # top-level Go tree here as it appears.
+          unformatted="$(gofmt -l cmd)"
+          if [ -n "$unformatted" ]; then
+            echo "gofmt would reformat:"
+            echo "$unformatted"
+            exit 1
+          fi
