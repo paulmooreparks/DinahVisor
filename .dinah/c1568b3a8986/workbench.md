@@ -101,14 +101,15 @@ once here so the columns stay short.
    by ascending creation ordinal, so severity and priority inform
    people and never the queue.
 
-7. Pull requests on this repository run under the operator's own
-   identity. The pipeline bot, login dinah-gh, holds read-only access
-   to paulmooreparks/DinahVisor: it can pull and cannot push, probed
-   2026-08-29. It therefore cannot create branches or PRs here, and
-   the source bench's rule that a PR authored by the operator's
-   account is a defect does not translate. Granting the bot write
-   access would restore that rule, and the grant is the operator's
-   call.
+7. Pull requests are created by the pipeline bot, login dinah-gh,
+   which holds write access to paulmooreparks/DinahVisor as it does
+   to the dinah repository, granted 2026-08-30. The source bench's
+   rule therefore translates unchanged: a PR authored by the
+   operator's own account is a defect, because GitHub refuses to let
+   an author approve their own pull request and such a PR silently
+   removes the operator's Approve button. The bot's token lives
+   outside every repository at $HOME/.dinah-gh-token, and only the
+   PR-create call uses it; git itself always runs as the operator.
 
 8. Four standards hang off this bench as workbench attachments:
    convention-counterexamples.md, prose-standard.md,
